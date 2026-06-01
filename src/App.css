@@ -1,0 +1,19 @@
+.app-shell {
+  display: grid;
+  grid-template-rows: 56px minmax(220px, 1fr) minmax(260px, 40%);
+  grid-template-columns: 240px 1fr;
+  grid-template-areas:
+    'transport transport'
+    'patterns rack'
+    'playlist playlist';
+  height: 100vh;
+  background: #1a1d24;
+  color: #d6d8de;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+@media (max-width: 1100px) {
+  .app-shell {
+    grid-template-columns: 200px 1fr;
+  }
+}

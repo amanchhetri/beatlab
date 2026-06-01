@@ -1,0 +1,58 @@
+.start-gate {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #1f2230 0%, #0e0f14 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.start-gate__panel {
+  text-align: center;
+  padding: 40px;
+}
+
+.start-gate__title {
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #4ec5d4;
+  margin: 0;
+}
+
+.start-gate__sub {
+  color: #7a808c;
+  margin: 6px 0 32px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.start-gate__button {
+  background: #4ec5d4;
+  color: #0e0f14;
+  border: 0;
+  padding: 14px 36px;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 8px;
+  transition: transform 80ms ease, opacity 80ms ease;
+}
+
+.start-gate__button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.start-gate__button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.start-gate__error {
+  color: #e54b4b;
+  margin-top: 20px;
+  font-size: 13px;
+}

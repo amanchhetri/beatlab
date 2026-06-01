@@ -1,0 +1,131 @@
+.pattern-list {
+  grid-area: patterns;
+  background: #1f222a;
+  border-right: 1px solid #2e3038;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.pattern-list__header {
+  padding: 12px 16px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7a808c;
+  border-bottom: 1px solid #2e3038;
+}
+
+.pattern-list__items {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.pattern-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  border-left: 2px solid transparent;
+  transition: background 80ms ease;
+}
+
+.pattern-item:hover {
+  background: #252830;
+}
+
+.pattern-item.is-active {
+  background: #2a2e38;
+  border-left-color: #4ec5d4;
+}
+
+.pattern-item__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3a3d47;
+  flex-shrink: 0;
+}
+
+.pattern-item__dot.is-active {
+  background: #4ec5d4;
+  box-shadow: 0 0 6px rgba(78, 197, 212, 0.6);
+}
+
+.pattern-item__name {
+  flex: 1;
+  font-size: 13px;
+  color: #d6d8de;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pattern-item__edit {
+  flex: 1;
+  background: #1a1d24;
+  border: 1px solid #4ec5d4;
+  color: #d6d8de;
+  font: inherit;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+.pattern-item__actions {
+  display: none;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.pattern-item:hover .pattern-item__actions {
+  display: flex;
+}
+
+.pattern-item__action {
+  background: transparent;
+  border: 0;
+  color: #7a808c;
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.pattern-item__action:hover:not(:disabled) {
+  background: #3a3d47;
+  color: #d6d8de;
+}
+
+.pattern-item__action:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pattern-list__new {
+  background: transparent;
+  border: 1px dashed #3a3d47;
+  color: #7a808c;
+  margin: 8px 14px 14px;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  transition: border-color 100ms ease, color 100ms ease;
+}
+
+.pattern-list__new:hover {
+  border-color: #4ec5d4;
+  color: #4ec5d4;
+}

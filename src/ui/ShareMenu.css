@@ -1,0 +1,64 @@
+.share-menu {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.share-menu__status {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-right: 4px;
+}
+
+.share-menu__status--busy {
+  color: #4ec5d4;
+  background: rgba(78, 197, 212, 0.1);
+}
+
+.share-menu__status--note {
+  color: #7be08b;
+  background: rgba(123, 224, 139, 0.1);
+}
+
+.share-menu__status--error {
+  color: #ffb3b3;
+  background: rgba(229, 75, 75, 0.15);
+}
+
+.share-btn {
+  background: transparent;
+  border: 1px solid #3a3d47;
+  color: #d6d8de;
+  padding: 6px 12px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  transition: background 80ms ease, color 80ms ease, border-color 80ms ease, opacity 80ms ease;
+}
+
+.share-btn:hover:not(:disabled) {
+  background: #2f323b;
+  border-color: #4a4d57;
+  color: #fff;
+}
+
+.share-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.share-btn--primary {
+  background: #4ec5d4;
+  color: #0e0f14;
+  border-color: #4ec5d4;
+  font-weight: 600;
+}
+
+.share-btn--primary:hover:not(:disabled) {
+  background: #6dd6e3;
+  border-color: #6dd6e3;
+  color: #0e0f14;
+}

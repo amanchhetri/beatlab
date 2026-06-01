@@ -1,0 +1,131 @@
+.transport-bar {
+  grid-area: transport;
+  height: 56px;
+  background: #252830;
+  border-bottom: 1px solid #2e3038;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 20px;
+}
+
+.transport-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.transport-share {
+  margin-left: auto;
+}
+
+.transport-title-group {
+  padding-left: 12px;
+  border-left: 1px solid #3a3d47;
+}
+
+.transport-title {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #4ec5d4;
+  font-size: 14px;
+}
+
+.transport-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: #2f323b;
+  color: #d6d8de;
+  border: 1px solid #3a3d47;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 100ms ease, border-color 100ms ease;
+}
+
+.transport-btn:hover {
+  background: #3a3d47;
+}
+
+.transport-btn--play.is-playing {
+  background: #4ec5d4;
+  border-color: #4ec5d4;
+  color: #0e0f14;
+}
+
+.transport-btn--rec {
+  color: #6b6f7a;
+  font-size: 18px;
+}
+
+.transport-btn--rec.is-armed {
+  background: #e54b4b;
+  border-color: #e54b4b;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(229, 75, 75, 0.5);
+}
+
+.transport-rec-label {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #7a808c;
+  width: 64px;
+}
+
+.transport-label {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #7a808c;
+}
+
+.transport-bpm {
+  background: #1a1d24;
+  border: 1px solid #3a3d47;
+  color: #d6d8de;
+  padding: 6px 10px;
+  width: 66px;
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+}
+
+.transport-bpm:focus {
+  outline: none;
+  border-color: #4ec5d4;
+}
+
+.mode-btn {
+  background: transparent;
+  border: 1px solid #3a3d47;
+  color: #9ca3af;
+  padding: 6px 14px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.mode-btn:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.mode-btn:last-child {
+  border-radius: 0 4px 4px 0;
+  border-left: 0;
+}
+
+.mode-btn.is-active {
+  background: #2f323b;
+  color: #4ec5d4;
+  border-color: #4ec5d4;
+}
+
+.transport-readout {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 12px;
+  color: #7a808c;
+  font-variant-numeric: tabular-nums;
+}
