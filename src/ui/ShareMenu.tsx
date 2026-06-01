@@ -36,6 +36,7 @@ export function ShareMenu() {
       patternOrder: s.patternOrder,
       playlist: s.playlist,
       bpm: s.bpm,
+      mixer: s.mixer,
     };
   }
 
@@ -73,6 +74,7 @@ export function ShareMenu() {
       patternOrder: parsed.patternOrder,
       playlist: parsed.playlist,
       bpm: parsed.bpm,
+      mixer: parsed.mixer,
     });
     flashNote(`Loaded ${file.name}`);
   }

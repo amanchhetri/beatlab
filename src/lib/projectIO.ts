@@ -1,5 +1,7 @@
 import type {
   Channel,
+  ChannelId,
+  MixerSettings,
   Pattern,
   PatternId,
   PlaylistBlock,
@@ -12,6 +14,8 @@ export type ProjectPayload = {
   patternOrder: PatternId[];
   playlist: PlaylistBlock[];
   bpm: number;
+  // Added after the initial release — optional for backward compat with older `.beatlab` files / URLs.
+  mixer?: Record<ChannelId, MixerSettings>;
 };
 
 export function serializeProject(p: ProjectPayload): string {

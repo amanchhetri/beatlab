@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { audio } from '../audio/engine';
+import { syncEngineFromStore } from '../audio';
 import './StartGate.css';
 
 type Status = 'idle' | 'loading' | 'failed';
@@ -11,6 +12,7 @@ export function StartGate({ onReady }: { onReady: () => void }) {
     setStatus('loading');
     try {
       await audio.start();
+      syncEngineFromStore();
       onReady();
     } catch (e) {
       console.error('Audio start failed', e);

@@ -1,5 +1,5 @@
-import { STEPS_PER_BAR } from './types';
-import type { Channel, ChannelId, Note, Pattern, PatternId } from './types';
+import { DEFAULT_MIXER_SETTINGS, STEPS_PER_BAR } from './types';
+import type { Channel, ChannelId, MixerSettings, Note, Pattern, PatternId } from './types';
 
 const FIXED_CHANNEL_IDS = {
   kick: 'ch-kick',
@@ -24,6 +24,14 @@ export const DEFAULT_CHANNELS: Channel[] = [
   { id: FIXED_CHANNEL_IDS.crash, type: 'drum', name: 'Crash', sampleId: 'crash' },
   { id: FIXED_CHANNEL_IDS.synth, type: 'synth', name: 'Synth', presetId: 'default' },
 ];
+
+export function defaultMixer(channels: Channel[]): Record<ChannelId, MixerSettings> {
+  const mixer: Record<ChannelId, MixerSettings> = {};
+  for (const ch of channels) {
+    mixer[ch.id] = { ...DEFAULT_MIXER_SETTINGS };
+  }
+  return mixer;
+}
 
 export function emptyPattern(id: PatternId, name: string, channels: Channel[]): Pattern {
   const drumGrid: Record<ChannelId, boolean[]> = {};

@@ -288,3 +288,91 @@ describe('ui slice', () => {
     expect(store.getState().pianoRollOpen).toBe(false);
   });
 });
+
+describe('mixer actions', () => {
+  it('boots with mixer entries for every channel at default volume', () => {
+    const store = createFreshStore();
+    const m = store.getState().mixer;
+    expect(Object.keys(m).length).toBe(store.getState().channels.length);
+    for (const ch of store.getState().channels) {
+      expect(m[ch.id].muted).toBe(false);
+      expect(m[ch.id].soloed).toBe(false);
+      expect(m[ch.id].volume).toBeGreaterThan(0);
+    }
+  });
+
+  it('setChannelVolume clamps to 0..1', () => {
+    const store = createFreshStore();
+    store.getState().setChannelVolume(KICK, 1.5);
+    expect(store.getState().mixer[KICK].volume).toBe(1);
+    store.getState().setChannelVolume(KICK, -0.2);
+    expect(store.getState().mixer[KICK].volume).toBe(0);
+    store.getState().setChannelVolume(KICK, 0.42);
+    expect(store.getState().mixer[KICK].volume).toBeCloseTo(0.42);
+  });
+
+  it('toggleChannelMute flips per channel', () => {
+    const store = createFreshStore();
+    store.getState().toggleChannelMute(KICK);
+    expect(store.getState().mixer[KICK].muted).toBe(true);
+    expect(store.getState().mixer[SNARE].muted).toBe(false);
+    store.getState().toggleChannelMute(KICK);
+    expect(store.getState().mixer[KICK].muted).toBe(false);
+  });
+
+  it('toggleChannelSolo flips per channel', () => {
+    const store = createFreshStore();
+    store.getState().toggleChannelSolo(KICK);
+    expect(store.getState().mixer[KICK].soloed).toBe(true);
+    store.getState().toggleChannelSolo(KICK);
+    expect(store.getState().mixer[KICK].soloed).toBe(false);
+  });
+});
+
+describe('synth controls', () => {
+  it('setSynthPreset updates the synth channel and clears per-channel overrides', () => {
+    const store = createFreshStore();
+    store.getState().setSynthCutoff(SYNTH_CHANNEL_ID, 4000);
+    store.getState().setSynthReverbWet(SYNTH_CHANNEL_ID, 0.5);
+    store.getState().setSynthPreset(SYNTH_CHANNEL_ID, 'bass');
+    const ch = store.getState().channels.find(c => c.id === SYNTH_CHANNEL_ID);
+    expect(ch?.type).toBe('synth');
+    if (ch?.type === 'synth') {
+      expect(ch.presetId).toBe('bass');
+      expect(ch.cutoff).toBeUndefined();
+      expect(ch.reverbWet).toBeUndefined();
+    }
+  });
+
+  it('setSynthCutoff clamps to [MIN_CUTOFF, MAX_CUTOFF]', () => {
+    const store = createFreshStore();
+    store.getState().setSynthCutoff(SYNTH_CHANNEL_ID, 99999);
+    const ch = store.getState().channels.find(c => c.id === SYNTH_CHANNEL_ID);
+    expect(ch?.type === 'synth' && ch.cutoff).toBe(8000);
+
+    store.getState().setSynthCutoff(SYNTH_CHANNEL_ID, 0);
+    const ch2 = store.getState().channels.find(c => c.id === SYNTH_CHANNEL_ID);
+    expect(ch2?.type === 'synth' && ch2.cutoff).toBe(200);
+  });
+
+  it('setSynthReverbWet clamps to 0..1', () => {
+    const store = createFreshStore();
+    store.getState().setSynthReverbWet(SYNTH_CHANNEL_ID, 5);
+    const ch = store.getState().channels.find(c => c.id === SYNTH_CHANNEL_ID);
+    expect(ch?.type === 'synth' && ch.reverbWet).toBe(1);
+
+    store.getState().setSynthReverbWet(SYNTH_CHANNEL_ID, -1);
+    const ch2 = store.getState().channels.find(c => c.id === SYNTH_CHANNEL_ID);
+    expect(ch2?.type === 'synth' && ch2.reverbWet).toBe(0);
+  });
+
+  it('synth control actions no-op on drum channels', () => {
+    const store = createFreshStore();
+    const before = store.getState().channels.find(c => c.id === KICK);
+    store.getState().setSynthPreset(KICK, 'bass');
+    store.getState().setSynthCutoff(KICK, 1000);
+    store.getState().setSynthReverbWet(KICK, 0.5);
+    const after = store.getState().channels.find(c => c.id === KICK);
+    expect(after).toEqual(before);
+  });
+});

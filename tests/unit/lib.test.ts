@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { findPlaylistPatterns } from '../../src/lib/playlist';
 import { stepsToSeconds, snapToNearestStep, pixelToBar } from '../../src/lib/positionMath';
+import { effectiveGain, isEffectivelyMuted, type MixerMap } from '../../src/lib/mixer';
 import type { PlaylistBlock } from '../../src/store/types';
 
 const block = (overrides: Partial<PlaylistBlock>): PlaylistBlock => ({
@@ -86,5 +87,61 @@ describe('pixelToBar', () => {
 
   it('clamps negatives to 0', () => {
     expect(pixelToBar(-10, 32)).toBe(0);
+  });
+});
+
+describe('mixer — isEffectivelyMuted / effectiveGain', () => {
+  const make = (overrides: MixerMap = {}): MixerMap => ({
+    a: { volume: 0.8, muted: false, soloed: false },
+    b: { volume: 0.5, muted: false, soloed: false },
+    c: { volume: 1.0, muted: false, soloed: false },
+    ...overrides,
+  });
+
+  it('returns false when nothing is muted or soloed', () => {
+    const m = make();
+    expect(isEffectivelyMuted(m, 'a')).toBe(false);
+    expect(isEffectivelyMuted(m, 'b')).toBe(false);
+  });
+
+  it('explicit mute returns true', () => {
+    const m = make({ a: { volume: 0.8, muted: true, soloed: false } });
+    expect(isEffectivelyMuted(m, 'a')).toBe(true);
+    expect(isEffectivelyMuted(m, 'b')).toBe(false);
+  });
+
+  it('any solo silences all non-solo channels', () => {
+    const m = make({ b: { volume: 0.5, muted: false, soloed: true } });
+    expect(isEffectivelyMuted(m, 'a')).toBe(true);
+    expect(isEffectivelyMuted(m, 'b')).toBe(false);
+    expect(isEffectivelyMuted(m, 'c')).toBe(true);
+  });
+
+  it('multiple solos play together', () => {
+    const m = make({
+      a: { volume: 0.8, muted: false, soloed: true },
+      b: { volume: 0.5, muted: false, soloed: true },
+    });
+    expect(isEffectivelyMuted(m, 'a')).toBe(false);
+    expect(isEffectivelyMuted(m, 'b')).toBe(false);
+    expect(isEffectivelyMuted(m, 'c')).toBe(true);
+  });
+
+  it('explicit mute on a solo channel still silences it', () => {
+    const m = make({ a: { volume: 0.8, muted: true, soloed: true } });
+    expect(isEffectivelyMuted(m, 'a')).toBe(true);
+  });
+
+  it('effectiveGain returns 0 when muted, volume otherwise', () => {
+    const m = make();
+    expect(effectiveGain(m, 'a')).toBeCloseTo(0.8);
+    const muted = make({ a: { volume: 0.8, muted: true, soloed: false } });
+    expect(effectiveGain(muted, 'a')).toBe(0);
+  });
+
+  it('unknown channel id is treated as not muted, default gain 1', () => {
+    const m = make();
+    expect(isEffectivelyMuted(m, 'unknown')).toBe(false);
+    expect(effectiveGain(m, 'unknown')).toBe(1);
   });
 });

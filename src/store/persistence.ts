@@ -3,11 +3,13 @@ import {
   MIN_BPM,
   MAX_BPM,
   type Channel,
+  type ChannelId,
+  type MixerSettings,
   type Pattern,
   type PatternId,
   type PlaylistBlock,
 } from './types';
-import { DEFAULT_CHANNELS, emptyPattern } from './defaults';
+import { DEFAULT_CHANNELS, defaultMixer, emptyPattern } from './defaults';
 import type { StoreState } from './useStore';
 import { decodeProjectFromUrlParam } from '../lib/projectIO';
 
@@ -21,6 +23,8 @@ type SerializedProject = {
   patterns: Record<PatternId, Pattern>;
   patternOrder: PatternId[];
   playlist: PlaylistBlock[];
+  // Added after v1 shipped — optional for backward compat with older saves.
+  mixer?: Record<ChannelId, MixerSettings>;
 };
 
 function freshProject(): SerializedProject {
@@ -31,6 +35,7 @@ function freshProject(): SerializedProject {
     patterns: { [id]: emptyPattern(id, 'Pattern 1', DEFAULT_CHANNELS) },
     patternOrder: [id],
     playlist: [],
+    mixer: defaultMixer(DEFAULT_CHANNELS),
   };
 }
 
@@ -63,6 +68,7 @@ export function loadInitialProjectWithSource(): HydrationResult {
             patterns: payload.patterns,
             patternOrder: payload.patternOrder,
             playlist: payload.playlist,
+            mixer: payload.mixer,
           };
         }
       }
@@ -103,7 +109,8 @@ export function attachPersistence(store: UseBoundStore<StoreApi<StoreState>>): (
       state.channels === prev.channels &&
       state.patterns === prev.patterns &&
       state.patternOrder === prev.patternOrder &&
-      state.playlist === prev.playlist
+      state.playlist === prev.playlist &&
+      state.mixer === prev.mixer
     ) {
       return;
     }
@@ -116,6 +123,7 @@ export function attachPersistence(store: UseBoundStore<StoreApi<StoreState>>): (
           patterns: state.patterns,
           patternOrder: state.patternOrder,
           playlist: state.playlist,
+          mixer: state.mixer,
         };
         localStorage.setItem(PROJECT_KEY, JSON.stringify(payload));
       } catch (e) {

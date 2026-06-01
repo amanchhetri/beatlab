@@ -1,5 +1,6 @@
 import { create, type StoreApi, type UseBoundStore } from 'zustand';
 import {
+  DEFAULT_MIXER_SETTINGS,
   MAX_BPM,
   MIN_BPM,
   TOTAL_PLAYLIST_BARS,
@@ -7,15 +8,19 @@ import {
   type BlockId,
   type Channel,
   type ChannelId,
+  type MixerSettings,
   type Note,
   type NoteId,
   type Pattern,
   type PatternId,
   type PlaybackMode,
   type PlaylistBlock,
+  type SynthChannel,
   type TransportPosition,
 } from './types';
-import { DEFAULT_CHANNELS, emptyPattern } from './defaults';
+import { DEFAULT_CHANNELS, defaultMixer, emptyPattern } from './defaults';
+import type { SynthPresetId } from '../audio/presets';
+import { MAX_CUTOFF, MIN_CUTOFF, SYNTH_PRESETS } from '../audio/presets';
 
 function newId(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 10)}-${Date.now().toString(36)}`;
@@ -38,6 +43,7 @@ export type ProjectSlice = {
   patterns: Record<PatternId, Pattern>;
   patternOrder: PatternId[];
   playlist: PlaylistBlock[];
+  mixer: Record<ChannelId, MixerSettings>;
 
   toggleStep: (patternId: PatternId, channelId: ChannelId, stepIndex: number) => void;
   addNote: (patternId: PatternId, channelId: ChannelId, note: Omit<Note, 'id'>) => NoteId;
@@ -53,6 +59,12 @@ export type ProjectSlice = {
   resizePlaylistBlock: (blockId: BlockId, lengthBars: number) => void;
   deletePlaylistBlock: (blockId: BlockId) => void;
   captureLiveHit: (channelId: ChannelId, pitch?: number, velocity?: number) => void;
+  setChannelVolume: (channelId: ChannelId, volume: number) => void;
+  toggleChannelMute: (channelId: ChannelId) => void;
+  toggleChannelSolo: (channelId: ChannelId) => void;
+  setSynthPreset: (channelId: ChannelId, presetId: SynthPresetId) => void;
+  setSynthCutoff: (channelId: ChannelId, cutoff: number) => void;
+  setSynthReverbWet: (channelId: ChannelId, wet: number) => void;
 };
 
 export type TransportSlice = {
@@ -100,6 +112,7 @@ export type StoreSeed = {
   patternOrder: PatternId[];
   playlist: PlaylistBlock[];
   bpm: number;
+  mixer?: Record<ChannelId, MixerSettings>;
 };
 
 export function createStore(seed?: StoreSeed): UseBoundStore<StoreApi<StoreState>> {
@@ -110,6 +123,7 @@ export function createStore(seed?: StoreSeed): UseBoundStore<StoreApi<StoreState
     let patternOrder: PatternId[];
     let playlist: PlaylistBlock[];
     let bpm: number;
+    let mixer: Record<ChannelId, MixerSettings>;
 
     if (seeded) {
       channels = seeded.channels;
@@ -117,6 +131,12 @@ export function createStore(seed?: StoreSeed): UseBoundStore<StoreApi<StoreState
       patternOrder = seeded.patternOrder;
       playlist = seeded.playlist;
       bpm = seeded.bpm;
+      // Backfill defaults for channels missing mixer entries (loading older files / URLs).
+      const seededMixer = seeded.mixer ?? {};
+      mixer = {};
+      for (const ch of channels) {
+        mixer[ch.id] = seededMixer[ch.id] ?? { ...DEFAULT_MIXER_SETTINGS };
+      }
     } else {
       const initialPatternId = newId('pat');
       channels = DEFAULT_CHANNELS;
@@ -124,6 +144,7 @@ export function createStore(seed?: StoreSeed): UseBoundStore<StoreApi<StoreState
       patternOrder = [initialPatternId];
       playlist = [];
       bpm = 120;
+      mixer = defaultMixer(channels);
     }
 
     const activePatternId = patternOrder[0];
@@ -133,6 +154,7 @@ export function createStore(seed?: StoreSeed): UseBoundStore<StoreApi<StoreState
       patterns,
       patternOrder,
       playlist,
+      mixer,
 
       bpm,
       isPlaying: false,
@@ -306,6 +328,60 @@ export function createStore(seed?: StoreSeed): UseBoundStore<StoreApi<StoreState
             },
           });
         }
+      },
+
+      setChannelVolume(channelId, volume) {
+        const current = get().mixer[channelId];
+        if (!current) return;
+        const safe = clamp(volume, 0, 1);
+        if (current.volume === safe) return;
+        set({ mixer: { ...get().mixer, [channelId]: { ...current, volume: safe } } });
+      },
+
+      toggleChannelMute(channelId) {
+        const current = get().mixer[channelId];
+        if (!current) return;
+        set({ mixer: { ...get().mixer, [channelId]: { ...current, muted: !current.muted } } });
+      },
+
+      toggleChannelSolo(channelId) {
+        const current = get().mixer[channelId];
+        if (!current) return;
+        set({ mixer: { ...get().mixer, [channelId]: { ...current, soloed: !current.soloed } } });
+      },
+
+      setSynthPreset(channelId, presetId) {
+        const channels = get().channels;
+        const channel = channels.find(c => c.id === channelId);
+        if (!channel || channel.type !== 'synth') return;
+        if (!SYNTH_PRESETS[presetId]) return;
+        // Switching presets resets the per-channel cutoff/reverbWet overrides
+        // so the new preset's defaults take effect cleanly.
+        const updated: SynthChannel = {
+          ...channel,
+          presetId,
+          cutoff: undefined,
+          reverbWet: undefined,
+        };
+        set({ channels: channels.map(c => (c.id === channelId ? updated : c)) });
+      },
+
+      setSynthCutoff(channelId, cutoff) {
+        const channels = get().channels;
+        const channel = channels.find(c => c.id === channelId);
+        if (!channel || channel.type !== 'synth') return;
+        const safe = clamp(Math.round(cutoff), MIN_CUTOFF, MAX_CUTOFF);
+        const updated: SynthChannel = { ...channel, cutoff: safe };
+        set({ channels: channels.map(c => (c.id === channelId ? updated : c)) });
+      },
+
+      setSynthReverbWet(channelId, wet) {
+        const channels = get().channels;
+        const channel = channels.find(c => c.id === channelId);
+        if (!channel || channel.type !== 'synth') return;
+        const safe = clamp(wet, 0, 1);
+        const updated: SynthChannel = { ...channel, reverbWet: safe };
+        set({ channels: channels.map(c => (c.id === channelId ? updated : c)) });
       },
 
       addPlaylistBlock(patternId, lane, startBar) {

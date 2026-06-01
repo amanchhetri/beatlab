@@ -23,6 +23,21 @@ export type SynthChannel = {
   type: 'synth';
   name: string;
   presetId: SynthPresetId;
+  // When undefined, fall back to the preset's defaults.
+  cutoff?: number;
+  reverbWet?: number;
+};
+
+export type MixerSettings = {
+  volume: number; // 0..1, linear gain
+  muted: boolean;
+  soloed: boolean;
+};
+
+export const DEFAULT_MIXER_SETTINGS: MixerSettings = {
+  volume: 0.85,
+  muted: false,
+  soloed: false,
 };
 
 export type Channel = DrumChannel | SynthChannel;
