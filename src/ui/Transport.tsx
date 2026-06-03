@@ -65,13 +65,23 @@ export function Transport() {
           aria-label={recordArm ? 'Disarm record' : 'Arm record'}
           onClick={toggleRecordArm}
         >
-          ●
+          <span className="transport-btn__dot" aria-hidden="true" />
         </button>
-        <span className="transport-rec-label">{recordArm ? 'REC' : 'arm Shift'}</span>
+        <span className="transport-rec-label mono">
+          {recordArm ? 'REC ON' : 'SHIFT TO ARM'}
+        </span>
       </div>
 
-      <div className="transport-group transport-readout">
-        Bar {position.bar + 1} · Step {position.step + 1}
+      <div className="transport-group transport-readout mono">
+        <span className="transport-readout__chunk">
+          <span className="transport-readout__cap">BAR</span>
+          <span className="transport-readout__val">{String(position.bar + 1).padStart(2, '0')}</span>
+        </span>
+        <span className="transport-readout__sep">·</span>
+        <span className="transport-readout__chunk">
+          <span className="transport-readout__cap">STEP</span>
+          <span className="transport-readout__val">{String(position.step + 1).padStart(2, '0')}</span>
+        </span>
       </div>
 
       <div className="transport-group transport-share">

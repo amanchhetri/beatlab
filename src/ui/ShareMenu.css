@@ -5,60 +5,75 @@
 }
 
 .share-menu__status {
-  font-size: 11px;
-  letter-spacing: 0.02em;
-  padding: 4px 10px;
-  border-radius: 4px;
-  margin-right: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  margin-right: var(--space-2);
+  border: 1px solid transparent;
+  font-weight: 600;
 }
 
 .share-menu__status--busy {
-  color: #4ec5d4;
-  background: rgba(78, 197, 212, 0.1);
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: rgba(78, 197, 212, 0.25);
 }
 
 .share-menu__status--note {
   color: #7be08b;
   background: rgba(123, 224, 139, 0.1);
+  border-color: rgba(123, 224, 139, 0.3);
 }
 
 .share-menu__status--error {
   color: #ffb3b3;
-  background: rgba(229, 75, 75, 0.15);
+  background: var(--accent-error-soft);
+  border-color: rgba(229, 75, 75, 0.35);
 }
 
 .share-btn {
-  background: transparent;
-  border: 1px solid #3a3d47;
-  color: #d6d8de;
-  padding: 6px 12px;
-  font-size: 11px;
-  letter-spacing: 0.06em;
+  background: var(--bg-input);
+  border: 1px solid var(--border-soft);
+  color: var(--text);
+  padding: 8px 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  border-radius: 4px;
-  transition: background 80ms ease, color 80ms ease, border-color 80ms ease, opacity 80ms ease;
+  border-radius: var(--radius-pill);
+  transition: background 140ms ease, color 140ms ease,
+              border-color 140ms ease, opacity 140ms ease,
+              box-shadow 200ms ease;
 }
 
 .share-btn:hover:not(:disabled) {
-  background: #2f323b;
-  border-color: #4a4d57;
-  color: #fff;
+  background: var(--bg-hover);
+  border-color: var(--border);
+  color: var(--text-bright);
 }
 
 .share-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
 .share-btn--primary {
-  background: #4ec5d4;
-  color: #0e0f14;
-  border-color: #4ec5d4;
-  font-weight: 600;
+  background: linear-gradient(135deg, var(--accent) 0%, #6dd6e3 100%);
+  color: var(--bg-canvas);
+  border-color: transparent;
+  font-weight: 700;
+  box-shadow: 0 0 14px rgba(78, 197, 212, 0.35);
+  position: relative;
 }
 
 .share-btn--primary:hover:not(:disabled) {
-  background: #6dd6e3;
-  border-color: #6dd6e3;
-  color: #0e0f14;
+  background: linear-gradient(135deg, #6dd6e3 0%, #88dde7 100%);
+  border-color: transparent;
+  color: var(--bg-canvas);
+  box-shadow: 0 0 22px rgba(78, 197, 212, 0.55);
+  transform: translateY(-1px);
 }
